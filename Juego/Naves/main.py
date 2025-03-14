@@ -131,9 +131,9 @@ while se_ejecuta:
         # Movimiento del jugador
         if evento.type == pygame.KEYDOWN:
             if evento.key == pygame.K_LEFT:
-                jugador_x_cambio -= 0.3
+                jugador_x_cambio -= 0.5
             if evento.key == pygame.K_RIGHT:
-                jugador_x_cambio += 0.3
+                jugador_x_cambio += 0.5
             if evento.key == pygame.K_SPACE:
                 if not bala_visible:
                     mixer.Sound("disparo.mp3").play()
@@ -158,7 +158,7 @@ while se_ejecuta:
     for e in range(cantidad_enemigos):
 
         # Game Over
-        if enemigo_y[e] > 470:
+        if enemigo_y[e] > 450:
             for k in range(cantidad_enemigos):
                 enemigo_y[k] = 1000
             texto_final()
