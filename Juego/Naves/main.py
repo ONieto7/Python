@@ -1,7 +1,7 @@
 import pygame
 import random
 import math
-import os
+from pygame import mixer
 
 # Inicialización de Pygame
 pygame.init()
@@ -15,6 +15,11 @@ icono = pygame.image.load("ovni.png")
 pygame.display.set_icon(icono)
 fondo = pygame.image.load("fondo.jpg")
 colision_img = pygame.image.load("colision.png")
+
+# Agregar Musica
+mixer.music.load("MusicaFondo.mp3")
+mixer.music.set_volume(0.3)
+mixer.music.play(-1)
 
 # Variables del Jugador
 img_jugador = pygame.image.load("astronave.png")
@@ -34,7 +39,7 @@ for e in range(cantidad_enemigos):
     img_enemigo.append(pygame.image.load("enemigo.png"))
     enemigo_x.append(random.randint(0, 736))
     enemigo_y.append(random.randint(50, 150))
-    enemigo_x_cambio.append(0.1)
+    enemigo_x_cambio.append(0.3)
     enemigo_y_cambio.append(30)
 
 # Variables de la Bala
@@ -42,7 +47,7 @@ img_bala = pygame.image.load("explosion.png")
 bala_x = 0
 bala_y = 480
 bala_x_cambio = 0
-bala_y_cambio = 0.5
+bala_y_cambio = 1
 bala_visible = False
 
 # Variable para colision
@@ -52,6 +57,23 @@ mostrar_colision = False
 
 # Variable para el puntaje
 puntaje = 0
+fuente = pygame.font.Font("Fastest.ttf", 32)
+texto_x = 10
+texto_y = 10
+
+# Texto de Game Over
+fuente_final = pygame.font.Font("Fastest.ttf", 64)
+
+# Función para mostrar el texto de Game Over
+def texto_final():
+    mi_fuente_final = fuente_final.render("GAME OVER", True, (255, 255, 255))
+    pantalla.blit(mi_fuente_final, (100, 250))
+
+
+# Función para mostrar el puntaje
+def mostrar_puntaje(x, y):
+    puntaje_texto = fuente.render(f"Puntaje: {puntaje}", True, (255, 255, 255))
+    pantalla.blit(puntaje_texto, (x, y))
 
 # Función para mostrar al jugador
 def jugador(x, y):
@@ -92,11 +114,12 @@ while se_ejecuta:
         # Movimiento del jugador
         if evento.type == pygame.KEYDOWN:
             if evento.key == pygame.K_LEFT:
-                jugador_x_cambio -= 0.1
+                jugador_x_cambio -= 0.3
             if evento.key == pygame.K_RIGHT:
-                jugador_x_cambio += 0.1
+                jugador_x_cambio += 0.3
             if evento.key == pygame.K_SPACE:
                 if not bala_visible:
+                    mixer.Sound("disparo.mp3").play()
                     bala_x = jugador_x
                     disparar_bala(bala_x, bala_y)
 
@@ -116,22 +139,30 @@ while se_ejecuta:
 
     # Actualizar la posición del enemigo
     for e in range(cantidad_enemigos):
+
+        # Game Over
+        if enemigo_y[e] > 500:
+            for k in range(cantidad_enemigos):
+                enemigo_y[k] = 1000
+            texto_final()
+            break
+
         enemigo_x[e] += enemigo_x_cambio[e]
 
         # Límites del enemigo
         if enemigo_x[e] <= 0:
-            enemigo_x_cambio[e] = 0.1
+            enemigo_x_cambio[e] = 0.5
             enemigo_y[e] += enemigo_y_cambio[e]
         elif enemigo_x[e] >= 736:
-            enemigo_x_cambio[e] = -0.1
+            enemigo_x_cambio[e] = -0.5
             enemigo_y[e] += enemigo_y_cambio[e]
 
         # Colisión
         if hay_colision(enemigo_x[e], enemigo_y[e], bala_x, bala_y):
+            mixer.Sound("Golpe.mp3").play()
             bala_y = 480
             bala_visible = False
             puntaje += 1
-            print(puntaje)
             tiempo_colision = pygame.time.get_ticks()
             pos_colision = (enemigo_x[e], enemigo_y[e])
             mostrar_colision = True
@@ -156,6 +187,8 @@ while se_ejecuta:
         mostrar_colision = False
 
     jugador(jugador_x, jugador_y)
+
+    mostrar_puntaje(texto_x, texto_y)
 
     # Actualizar la pantalla
     pygame.display.update()
