@@ -57,23 +57,31 @@ mostrar_colision = False
 
 # Variable para el puntaje
 puntaje = 0
+enemigo_colisionados = 0
+nivel = 1
 fuente = pygame.font.Font("Fastest.ttf", 32)
 texto_x = 10
 texto_y = 10
 
-# Texto de Game Over
+# Texto de Informacion
 fuente_final = pygame.font.Font("Fastest.ttf", 64)
+fuente_nivel = pygame.font.Font("freesansbold.ttf", 24)
 
 # Función para mostrar el texto de Game Over
 def texto_final():
+    mixer.music.stop()
     mi_fuente_final = fuente_final.render("GAME OVER", True, (255, 255, 255))
     pantalla.blit(mi_fuente_final, (100, 250))
-
 
 # Función para mostrar el puntaje
 def mostrar_puntaje(x, y):
     puntaje_texto = fuente.render(f"Puntaje: {puntaje}", True, (255, 255, 255))
     pantalla.blit(puntaje_texto, (x, y))
+
+# Función para mostrar el nivel
+def mostrar_nivel(x, y):
+    nivel_texto = fuente_nivel.render(f"Nivel: {nivel}", True, (255, 255, 255))
+    pantalla.blit(nivel_texto, (x, y))
 
 # Función para mostrar al jugador
 def jugador(x, y):
@@ -96,6 +104,15 @@ def hay_colision(x_1, y_1, x_2, y_2):
         return True
     else:
         return False
+
+# Funcion subir Nivel
+def incrementar_nivel():
+    global cantidad_enemigos
+    for i in range(cantidad_enemigos):
+        if enemigo_x_cambio[i] > 0:
+            enemigo_x_cambio[i] += 0.1
+        else:
+            enemigo_x_cambio[i] -= 0.1
 
 # Bucle principal
 se_ejecuta = True
@@ -141,7 +158,7 @@ while se_ejecuta:
     for e in range(cantidad_enemigos):
 
         # Game Over
-        if enemigo_y[e] > 500:
+        if enemigo_y[e] > 470:
             for k in range(cantidad_enemigos):
                 enemigo_y[k] = 1000
             texto_final()
@@ -163,11 +180,17 @@ while se_ejecuta:
             bala_y = 480
             bala_visible = False
             puntaje += 1
+            enemigo_colisionados += 1
             tiempo_colision = pygame.time.get_ticks()
             pos_colision = (enemigo_x[e], enemigo_y[e])
             mostrar_colision = True
             enemigo_x[e] = random.randint(0, 736)
             enemigo_y[e] = random.randint(50, 150)
+
+            # Incrementar nivel cada 10 enemigos colisionados
+            if enemigo_colisionados % 10 == 0:
+                incrementar_nivel()
+                nivel += 1
 
         enemigo(enemigo_x[e], enemigo_y[e], e)
 
@@ -189,6 +212,7 @@ while se_ejecuta:
     jugador(jugador_x, jugador_y)
 
     mostrar_puntaje(texto_x, texto_y)
+    mostrar_nivel(texto_x + 650 , texto_y + 10)
 
     # Actualizar la pantalla
     pygame.display.update()
