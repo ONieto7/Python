@@ -107,12 +107,13 @@ def hay_colision(x_1, y_1, x_2, y_2):
 
 # Funcion subir Nivel
 def incrementar_nivel():
-    global cantidad_enemigos
+    global cantidad_enemigos, bala_y_cambio
     for i in range(cantidad_enemigos):
         if enemigo_x_cambio[i] > 0:
-            enemigo_x_cambio[i] += 0.1
+            enemigo_x_cambio[i] += 0.05
         else:
-            enemigo_x_cambio[i] -= 0.1
+            enemigo_x_cambio[i] -= 0.05
+    bala_y_cambio += 0.05  # Incrementar la velocidad de la bala
 
 # Bucle principal
 se_ejecuta = True
@@ -162,16 +163,17 @@ while se_ejecuta:
             for k in range(cantidad_enemigos):
                 enemigo_y[k] = 1000
             texto_final()
+            se_ejecuta = False
             break
 
         enemigo_x[e] += enemigo_x_cambio[e]
 
         # Límites del enemigo
         if enemigo_x[e] <= 0:
-            enemigo_x_cambio[e] = 0.5
+            enemigo_x_cambio[e] = abs(enemigo_x_cambio[e])  # Asegurarse de que sea positivo
             enemigo_y[e] += enemigo_y_cambio[e]
         elif enemigo_x[e] >= 736:
-            enemigo_x_cambio[e] = -0.5
+            enemigo_x_cambio[e] = -abs(enemigo_x_cambio[e])  # Asegurarse de que sea negativo
             enemigo_y[e] += enemigo_y_cambio[e]
 
         # Colisión
@@ -189,7 +191,9 @@ while se_ejecuta:
 
             # Incrementar nivel cada 10 enemigos colisionados
             if enemigo_colisionados % 10 == 0:
+                print(f"Nivel: {nivel}, Velocidades antes: {enemigo_x_cambio}")
                 incrementar_nivel()
+                print(f"Velocidades después: {enemigo_x_cambio}")
                 nivel += 1
 
         enemigo(enemigo_x[e], enemigo_y[e], e)
