@@ -2,6 +2,7 @@ import pygame
 import random
 import math
 from pygame import mixer
+import io
 
 # Inicialización de Pygame
 pygame.init()
@@ -10,13 +11,13 @@ pygame.init()
 pantalla = pygame.display.set_mode((800, 600))
 
 # Título de la ventana e icono
-pygame.display.set_caption(" Invasión Espacial ")
+pygame.display.set_caption("Invasión Espacial")
 icono = pygame.image.load("ovni.png")
 pygame.display.set_icon(icono)
 fondo = pygame.image.load("fondo.jpg")
 colision_img = pygame.image.load("colision.png")
 
-# Agregar Musica
+# Agregar música de fondo
 mixer.music.load("MusicaFondo.mp3")
 mixer.music.set_volume(0.3)
 mixer.music.play(-1)
@@ -50,7 +51,7 @@ bala_x_cambio = 0
 bala_y_cambio = 1
 bala_visible = False
 
-# Variable para colision
+# Variable para colisión
 tiempo_colision = 0
 pos_colision = (0, 0)
 mostrar_colision = False
@@ -59,19 +60,29 @@ mostrar_colision = False
 puntaje = 0
 enemigo_colisionados = 0
 nivel = 1
+fuente_como_bytes = None
+
+# Función para cargar la fuente como bytes
+def fuente_bytes(fuente):
+    with open(fuente, "rb") as f:
+        ttf_bytes = f.read()
+    return io.BytesIO(ttf_bytes)
+
+# Cargar fuentes
+fuente_como_bytes = fuente_bytes("FreeSansBold.ttf")
 fuente = pygame.font.Font("Fastest.ttf", 32)
+fuente_final = pygame.font.Font(fuente_como_bytes, 40)
+fuente_nivel = pygame.font.Font("freesansbold.ttf", 24)
+
+# Texto de información
 texto_x = 10
 texto_y = 10
-
-# Texto de Informacion
-fuente_final = pygame.font.Font("Fastest.ttf", 64)
-fuente_nivel = pygame.font.Font("freesansbold.ttf", 24)
 
 # Función para mostrar el texto de Game Over
 def texto_final():
     mixer.music.stop()
     mi_fuente_final = fuente_final.render("GAME OVER", True, (255, 255, 255))
-    pantalla.blit(mi_fuente_final, (100, 250))
+    pantalla.blit(mi_fuente_final, (60, 200))
 
 # Función para mostrar el puntaje
 def mostrar_puntaje(x, y):
@@ -97,7 +108,7 @@ def disparar_bala(x, y):
     bala_visible = True
     pantalla.blit(img_bala, (x + 16, y + 10))
 
-# Funcion detectar colisiones
+# Función detectar colisiones
 def hay_colision(x_1, y_1, x_2, y_2):
     distancia = math.sqrt((math.pow(x_1 - x_2, 2)) + (math.pow(y_1 - y_2, 2)))
     if distancia < 27:
@@ -105,7 +116,7 @@ def hay_colision(x_1, y_1, x_2, y_2):
     else:
         return False
 
-# Funcion subir Nivel
+# Función subir Nivel
 def incrementar_nivel():
     global cantidad_enemigos, bala_y_cambio
     for i in range(cantidad_enemigos):
@@ -190,10 +201,8 @@ while se_ejecuta:
             enemigo_y[e] = random.randint(50, 150)
 
             # Incrementar nivel cada 10 enemigos colisionados
-            if enemigo_colisionados % 10 == 0:
-                print(f"Nivel: {nivel}, Velocidades antes: {enemigo_x_cambio}")
+            if enemigo_colisionados % 10 == 0:           
                 incrementar_nivel()
-                print(f"Velocidades después: {enemigo_x_cambio}")
                 nivel += 1
 
         enemigo(enemigo_x[e], enemigo_y[e], e)
