@@ -69,7 +69,7 @@ def trasformar_audio_en_texto():
             # devolver error
             return "sigo esperando"
         
-        
+
 # funcion para que el asistente pueda ser escuchado
 def hablar(mensaje):
 
@@ -80,3 +80,55 @@ def hablar(mensaje):
     # pronunciar mensaje
     engine.say(mensaje)
     engine.runAndWait()
+
+
+# informar el dia de la semana
+def pedir_dia():
+
+    # crear variable con datos de hoy
+    dia = datetime.date.today()
+    print(dia)
+
+    # crear variable para el dia de semana
+    dia_semana = dia.weekday()
+    print(dia_semana)
+
+    # diccionario con nombres de dias
+    calendario = {0: 'Lunes',
+                  1: 'Martes',
+                  2: 'Miércoles',
+                  3: 'Jueves',
+                  4: 'Viernes',
+                  5: 'Sábado',
+                  6: 'Domingo'}
+
+    # decir el dia de la semana
+    hablar(f'Hoy es {calendario[dia_semana]}')
+
+
+# informar que hora es
+def pedir_hora():
+
+    # crear una variab;e con datos de la hora
+    hora = datetime.datetime.now()
+    hora = f'En este momento son las {hora.hour} horas con {hora.minute} minutos y {hora.second} segundos'
+    print(hora)
+
+    # decir la hora
+    hablar(hora)
+
+
+# funcion saludo inicial
+def saludo_inicial():
+
+    # crear variable condatos de hora
+    hora = datetime.datetime.now()
+    if hora.hour < 6 or hora.hour > 20:
+        momento = 'Buenas noches'
+    elif 6 <= hora.hour < 13:
+        momento = 'Buen día'
+    else:
+        momento = 'Buenas tardes'
+
+    # decir el saludo
+    hablar(f'{momento}, soy Helena, tu asistente personal. Por favor, dime en qué te puedo ayudar')
