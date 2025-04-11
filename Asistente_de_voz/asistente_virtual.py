@@ -6,6 +6,7 @@ import pyjokes
 import webbrowser
 import datetime
 import wikipedia
+import requests 
 
 # opciones de voz / idioma
 id1 = 'HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Speech\Voices\Tokens\TTS_MS_ES-MX_SABINA_11.0'
@@ -117,6 +118,41 @@ def pedir_hora():
     # decir la hora
     hablar(hora)
 
+# Función para obtener el clima
+def pedir_clima(ciudad):
+    try:
+        # Clave API de OpenWeatherMap (reemplaza con tu propia clave)
+        api_key = "TU_CLAVE_API"
+
+        # URL de la API
+        url = f"http://api.openweathermap.org/data/2.5/weather?q={ciudad}&appid={api_key}&lang=es&units=metric"
+
+        # Hacer la solicitud a la API
+        respuesta = requests.get(url)
+        datos = respuesta.json()
+
+        # Verificar si la ciudad es válida
+        if datos["cod"] == 200:
+            # Extraer información del clima
+            descripcion = datos["weather"][0]["description"]
+            temperatura = datos["main"]["temp"]
+            humedad = datos["main"]["humidity"]
+
+            # Crear el mensaje del clima
+            mensaje = (f"En {ciudad} hay {descripcion}. "
+                       f"La temperatura es de {temperatura} grados Celsius "
+                       f"y la humedad es del {humedad} por ciento.")
+            print(mensaje)
+
+            # Decir el clima
+            hablar(mensaje)
+        else:
+            # Si la ciudad no es válida
+            hablar("No he podido encontrar información sobre esa ciudad. Por favor, intenta con otra.")
+    except Exception as e:
+        print(f"Error al obtener el clima: {e}")
+        hablar("Ha ocurrido un error al intentar obtener el clima.")
+
 
 # funcion saludo inicial
 def saludo_inicial():
@@ -198,6 +234,11 @@ def pedir_cosas():
             except:
                 hablar("Perdón pero no la he encontrado")
                 continue
+        elif 'clima' in pedido:
+            hablar("Por favor, dime el nombre de la ciudad.")
+            ciudad = trasformar_audio_en_texto().lower()
+            pedir_clima(ciudad)
+            continue
         elif 'adiós' in pedido:
             hablar("Me voy a descansar, cualquier cosa me avisas")
             break
