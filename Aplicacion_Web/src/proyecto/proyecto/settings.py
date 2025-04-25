@@ -55,7 +55,7 @@ ROOT_URLCONF = 'proyecto.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': ['C:\\Cursos\\UDEMY\\Python_TOTAL\\Python\\Aplicacion_Web\\src\\proyecto\\base\\templates'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
